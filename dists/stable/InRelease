@@ -5,7 +5,7 @@ Origin: metalsandbox
 Label: ddns-go-apt
 Suite: stable
 Codename: stable
-Date: Thu, 29 Oct 2026 16:03:02 +0000
+Date: Thu, 29 Oct 2026 16:03:57 +0000
 Architectures: amd64 arm64
 Components: main
 Description: Unofficial ddns-go Debian packages
@@ -16,8 +16,8 @@ SHA256:
  cb42e3e007a1392ad4ed2d6af72b642e47dae56f48d5a988dbc171f17ab7e44b              402 main/binary-arm64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCauNuNgAKCRA+cwaJIER+
-Vo1+AQDFwiETJKMrKMZr80EWbPfrjJRpmkgHSxWpJcwhScRuZQD/eNMn1GWhLEYf
-rt8w8DhlENe3NeM/yqnpe8Rb78cNbAc=
-=Z2Yh
+iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCauNubQAKCRA+cwaJIER+
+VocTAQCtevUkp3umuR/CNPUVKamfr17h28VWlG7ZVSPwy6DC7wD/eMPHGh/nFS3O
+ZkfYeF2/ThuvYbl5IQQ372I8FjOKKAk=
+=l5Jl
 -----END PGP SIGNATURE-----
