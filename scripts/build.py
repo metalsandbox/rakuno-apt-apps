@@ -19,7 +19,7 @@ UPSTREAM = "https://api.github.com/repos/jeessy2/ddns-go/releases/"
 ARCHES = {"amd64": "x86_64", "arm64": "arm64"}
 
 def download(url):
-    headers = {"User-Agent": "metalsandbox-ddns-go-apt"}
+    headers = {"User-Agent": "metalsandbox-rakuno-apt-apps"}
     if url.startswith("https://api.github.com/") and os.getenv("GH_TOKEN"):
         headers["Authorization"] = "Bearer " + os.environ["GH_TOKEN"]
     with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=120) as response:
@@ -104,21 +104,21 @@ Description: Simple dynamic DNS client
     dist = repo / "dists/stable"
     now = datetime.datetime.now(datetime.timezone.utc).strftime("%a, %d %b %Y %H:%M:%S +0000")
     release_text = f"""Origin: metalsandbox
-Label: ddns-go-apt
+Label: rakuno-apt-apps
 Suite: stable
 Codename: stable
 Date: {now}
 Architectures: amd64 arm64
 Components: main
-Description: Unofficial ddns-go Debian packages
+Description: Rakuno apps and Debian packages
 SHA256:
 """
     for path in sorted(dist.rglob("Packages*")):
         data = path.read_bytes()
         release_text += f" {hashlib.sha256(data).hexdigest()} {len(data):16d} {path.relative_to(dist)}\n"
     write(dist / "Release", release_text)
-    write(repo / "ddns-go-apt.gpg", (ROOT / "keys/ddns-go-apt.gpg").read_bytes())
-    write(repo / "index.html", '<!doctype html><meta charset="utf-8"><title>ddns-go APT</title><h1>ddns-go APT repository</h1><p><a href="https://github.com/metalsandbox/ddns-go-apt#readme">Installation and signing fingerprint</a></p>')
+    write(repo / "rakuno-apt-apps.gpg", (ROOT / "keys/rakuno-apt-apps.gpg").read_bytes())
+    write(repo / "index.html", '<!doctype html><meta charset="utf-8"><title>Rakuno APT Apps</title><h1>Rakuno APT Apps</h1><p><a href="https://github.com/metalsandbox/rakuno-apt-apps#readme">Installation and signing fingerprint</a></p>')
     write(repo / ".nojekyll", "")
     write(repo / "upstream.json", json.dumps({"tag": tag, "revision": revision}, indent=2) + "\n")
     print(f"Built {debversion}")

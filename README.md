@@ -1,10 +1,10 @@
 # ddns-go APT
 
-个人维护的 ddns-go Debian 软件包与签名 APT 源，参考 [homebrew-apps](https://github.com/metalsandbox/homebrew-apps) 的定时更新结构。与 Debian 或 ddns-go 作者无隶属关系。
+个人维护的多应用 Debian 软件包与签名 APT 源，ddns-go 是首个软件包，参考 [homebrew-apps](https://github.com/metalsandbox/homebrew-apps) 的定时更新结构。与 Debian 或 ddns-go 作者无隶属关系。
 
 - 上游：[jeessy2/ddns-go](https://github.com/jeessy2/ddns-go)。仅包装官方稳定版 Linux 二进制，不重新编译。
 - 架构：amd64、arm64。目标为使用 systemd 的 Debian 12/13。
-- 发布地址：https://metalsandbox.github.io/ddns-go-apt/
+- 发布地址：https://metalsandbox.github.io/rakuno-apt-apps/
 - 每日 UTC 03:37（北京时间 11:37）检查并构建，也支持 Actions 手动指定上游 tag 和 Debian revision。
 - 下载必须通过上游 checksums.txt 校验；GitHub 提供 asset digest 时同时验证。校验值与二进制来自同一上游，不构成独立作者签名验证。
 - Release/InRelease 使用本仓库专用 GPG 密钥签名，旧包保存在 gh-pages 分支并进入索引。
@@ -15,8 +15,8 @@
 先确认系统已有 curl、gpg、ca-certificates、systemd。安装这些依赖前请自行确认。
 
 ```sh
-curl -fsSLo /tmp/ddns-go-apt.gpg https://metalsandbox.github.io/ddns-go-apt/ddns-go-apt.gpg
-gpg --show-keys --with-fingerprint /tmp/ddns-go-apt.gpg
+curl -fsSLo /tmp/rakuno-apt-apps.gpg https://metalsandbox.github.io/rakuno-apt-apps/rakuno-apt-apps.gpg
+gpg --show-keys --with-fingerprint /tmp/rakuno-apt-apps.gpg
 ```
 
 核对完整指纹：
@@ -29,8 +29,8 @@ gpg --show-keys --with-fingerprint /tmp/ddns-go-apt.gpg
 
 ```sh
 sudo install -d -m 0755 /etc/apt/keyrings
-sudo install -m 0644 /tmp/ddns-go-apt.gpg /etc/apt/keyrings/ddns-go-apt.gpg
-printf '%s\n' 'deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/ddns-go-apt.gpg] https://metalsandbox.github.io/ddns-go-apt stable main' | sudo tee /etc/apt/sources.list.d/ddns-go-apt.list
+sudo install -m 0644 /tmp/rakuno-apt-apps.gpg /etc/apt/keyrings/rakuno-apt-apps.gpg
+printf '%s\n' 'deb [arch=amd64,arm64 signed-by=/etc/apt/keyrings/rakuno-apt-apps.gpg] https://metalsandbox.github.io/rakuno-apt-apps stable main' | sudo tee /etc/apt/sources.list.d/rakuno-apt-apps.list
 sudo apt update
 apt-cache policy ddns-go
 sudo apt install ddns-go
@@ -73,10 +73,20 @@ GNUPGHOME=/path/to/dedicated/key-directory sh scripts/sign.sh
 python3 scripts/verify.py
 ```
 
-`APT_SIGNING_KEY` 仓库 Actions Secret 保存 ASCII-armored 专用私钥。私钥与撤销证书不得提交到任何分支；公钥见 `keys/ddns-go-apt.gpg`。修改密钥需同步更新脚本指纹、README 和客户端信任。限制仓库写权限，因为可修改工作流的用户能够使用签名 Secret。
+`APT_SIGNING_KEY` 仓库 Actions Secret 保存 ASCII-armored 仓库专用私钥。现有密钥 UID 保留最初的 ddns-go 名称，指纹不变，可继续为本源的其他软件包签名。私钥与撤销证书不得提交到任何分支；公钥见 `keys/rakuno-apt-apps.gpg`。修改密钥需同步更新脚本指纹、README 和客户端信任。限制仓库写权限，因为可修改工作流的用户能够使用签名 Secret。
 
 `verify.py` 使用项目内的临时 APT 状态目录验证签名、索引、候选版本及软件包结构，不写系统源、不安装程序。服务实际运行及安装/卸载尚需用户安装后验证。
 
 Actions 在 main 更新、每天定时和手动触发时构建，构建验证成功后自动发布。无新版时仍刷新签名索引。GitHub 定时任务可能延迟，长期无活动的公开仓库可能停用定时任务。Pages 及 gh-pages 产物均公开。失败时保留上一次 Pages 部署。
 
 打包脚本为 MIT，ddns-go 及随包版权文件遵循上游 MIT 许可。
+
+## 扩展应用
+
+这是统一 APT 源，新增应用继续使用相同源地址与签名公钥，无需客户端再添加源。
+
+每个应用需提供独立的上游版本发现、官方来源校验与 Debian 打包步骤。包放入 `repo/pool/main/<首字母>/<包名>/`，各架构 `.deb` 文件以 `_<架构>.deb` 结尾。现有索引生成器会收录 pool 下所有 amd64/arm64 包及旧版本，不限于 ddns-go。新增其他架构时需同步扩展索引和 Release 的 Architectures。
+
+新增包的构建应接入同一个串行发布工作流，在统一生成索引和签名前完成，避免多个工作流相互覆盖 gh-pages。当前 `scripts/build.py` 实现首个 ddns-go 构建与共享索引生成；新增第二个包时应将共享索引生成拆为独立步骤。不要覆盖已有版本文件；修改打包内容必须增加 Debian revision。
+
+目前仅发布 ddns-go，不代表已提供其他应用。

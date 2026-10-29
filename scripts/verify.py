@@ -7,7 +7,7 @@ import subprocess
 import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 os.chdir(ROOT)
-subprocess.run(["gpgv", "--keyring", str(ROOT / "keys/ddns-go-apt.gpg"), "repo/dists/stable/InRelease"], check=True)
+subprocess.run(["gpgv", "--keyring", str(ROOT / "keys/rakuno-apt-apps.gpg"), "repo/dists/stable/InRelease"], check=True)
 unit_check = ROOT / "build/unit-check/ddns-go.service"
 unit_check.parent.mkdir(parents=True, exist_ok=True)
 unit_check.write_text((ROOT / "packaging/ddns-go.service").read_text().replace("ExecStart=/usr/bin/ddns-go", f"ExecStart={ROOT}/build/amd64/usr/bin/ddns-go"))
@@ -21,7 +21,7 @@ with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
     (tmp / "lists/partial").mkdir(parents=True)
     (tmp / "cache/archives/partial").mkdir(parents=True)
     (tmp / "status").touch()
-    (tmp / "sources.list").write_text(f"deb [signed-by={ROOT}/keys/ddns-go-apt.gpg] file:{ROOT}/repo stable main\n")
+    (tmp / "sources.list").write_text(f"deb [signed-by={ROOT}/keys/rakuno-apt-apps.gpg] file:{ROOT}/repo stable main\n")
     opts = ["-o", f"Dir::Etc::sourcelist={tmp}/sources.list", "-o", "Dir::Etc::sourceparts=-", "-o", f"Dir::State={tmp}", "-o", f"Dir::State::status={tmp}/status", "-o", f"Dir::Cache={tmp}/cache", "-o", "APT::Sandbox::User=" + __import__('getpass').getuser(), "-o", "APT::Get::List-Cleanup=0"]
     subprocess.run(["apt-get", *opts, "update"], check=True)
     policy = subprocess.check_output(["apt-cache", *opts, "policy", "ddns-go"], text=True)
