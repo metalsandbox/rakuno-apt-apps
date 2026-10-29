@@ -1,0 +1,15 @@
+Package: ddns-go
+Version: 6.17.7-1
+Section: net
+Priority: optional
+Architecture: amd64
+Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
+Depends: ca-certificates, systemd (>= 245)
+Homepage: https://github.com/jeessy2/ddns-go
+Description: Simple dynamic DNS client
+ Upstream ddns-go binary packaged with a sandboxed systemd service.
+ Configuration listens on localhost:9876 and is retained across removal.
+Filename: pool/main/d/ddns-go/ddns-go_6.17.7-1_amd64.deb
+Size: 3870838
+SHA256: 5227efe2e0b4e0dcb2af67e4f2655e7287fa67b21940265e9c8daafb5d965538
+

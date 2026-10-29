@@ -1,0 +1,23 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Origin: metalsandbox
+Label: ddns-go-apt
+Suite: stable
+Codename: stable
+Date: Thu, 29 Oct 2026 16:01:46 +0000
+Architectures: amd64 arm64
+Components: main
+Description: Unofficial ddns-go Debian packages
+SHA256:
+ acbc0cb2d2c0f9102cbf01f386d7b90f8ece96a7e81a6db00d91d53f3038ccec              565 main/binary-amd64/Packages
+ a5f120e4ffa2ed9819adfbcb964917ca30c3f4475747701cf363cbe4b1dd62c7              401 main/binary-amd64/Packages.gz
+ f927c1a3431bef0272656b4aeb28f9a044f73a8fa1e5c594812f73c266611c02              565 main/binary-arm64/Packages
+ 88faa478c1e8d57ffb8164459109a14be4c054a010967f050f5d2f56f37796d0              401 main/binary-arm64/Packages.gz
+-----BEGIN PGP SIGNATURE-----
+
+iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCauNt6gAKCRA+cwaJIER+
+VhFZAQDfsx8LKGX+CBIMQu8kWJu6qcJNhvM+ESvqXLgQZ/9yuwEAy4IpQXZuOPk1
+2lkaRTSIMUYIH/6TS8uyDP+XcU8+Lwo=
+=xcbU
+-----END PGP SIGNATURE-----
