@@ -87,7 +87,11 @@ Description: Simple dynamic DNS client
         write(stage / "DEBIAN/control", control)
         output = repo / "pool/main/d/ddns-go" / f"ddns-go_{debversion}_{arch}.deb"
         output.parent.mkdir(parents=True, exist_ok=True)
-        subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(stage), str(output)], check=True)
+        # Published versions are immutable; bump --revision for packaging changes.
+        if not output.exists():
+            subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(stage), str(output)], check=True)
+        else:
+            print(f"Preserving published package {output.name}")
     for arch in ARCHES:
         entries = []
         for package in sorted((repo / "pool").rglob(f"*_{arch}.deb")):
