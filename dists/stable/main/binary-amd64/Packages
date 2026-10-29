@@ -10,6 +10,6 @@ Description: Simple dynamic DNS client
  Upstream ddns-go binary packaged with a sandboxed systemd service.
  Configuration listens on localhost:9876 and is retained across removal.
 Filename: pool/main/d/ddns-go/ddns-go_6.17.7-1_amd64.deb
-Size: 3870838
-SHA256: 5227efe2e0b4e0dcb2af67e4f2655e7287fa67b21940265e9c8daafb5d965538
+Size: 3870840
+SHA256: 27cae4a5d026b89d91902bfde77047d2da9e06f289e1a89ed24f976f684d9293
 
