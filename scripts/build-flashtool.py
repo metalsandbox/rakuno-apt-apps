@@ -82,7 +82,17 @@ Description: Sony Xperia S1 firmware flasher (official Linux bundle)
 """)
     # Include corresponding upstream source next to the binary distribution.
     source = download("https://github.com/Androxyde/Flashtool/archive/29709d7e6291d8aacd496688708f77a4fc89daec.tar.gz")
-    write(output.parent / "xperia-flashtool_0.9.36.0.upstream-source.tar.gz", source)
+    # Keep the complete upstream archive (including bundled build resources),
+    # split below GitHub's 100 MiB Git blob limit without discarding sources.
+    part_size = 90 * 1024 * 1024
+    for part, offset in enumerate(range(0, len(source), part_size)):
+        write(output.parent / f"xperia-flashtool_0.9.36.0.upstream-source.tar.gz.part{part:02d}", source[offset:offset + part_size])
+    write(output.parent / "SOURCE.txt", f"""Complete upstream source archive, split to fit GitHub Git size limits.
+Reassemble: cat xperia-flashtool_0.9.36.0.upstream-source.tar.gz.part* > upstream-source.tar.gz
+SHA256 (reassembled): {hashlib.sha256(source).hexdigest()}
+Original: https://github.com/Androxyde/Flashtool/archive/29709d7e6291d8aacd496688708f77a4fc89daec.tar.gz
+Packaging source: https://github.com/metalsandbox/rakuno-apt-apps
+""")
     write(output.parent / "xperia-flashtool_devices-source.tar.gz", (ROOT / "downloads/devices.tar.gz").read_bytes())
     output.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(stage), str(output)], check=True)
