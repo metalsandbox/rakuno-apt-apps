@@ -115,3 +115,26 @@ SSH 会话本身不获得桌面 USB 权限。软件包不会启动刷机、解�
 
 CI 在临时 Debian 13 容器内验证依赖安装、Java、普通用户图形启动与离线设备库，
 不连接手机，不验证真实硬件刷写。发布后再验证 HTTPS 签名源和 APT 候选版本。
+
+### Xperia Flashtool Legacy 0.9.22.3
+
+针对实际为 SOL23、当前却报告旧跨刷系统 C6903 型号的恢复场景，提供独立旧版包。
+原版 0.9.22.3 早于后续严格型号字符串检查；不修改 FTF 或程序 JAR。
+这不表示其他型号手机可以使用 SOL23 固件。实际刷写仍由用户手动开始。
+
+```sh
+sudo apt update
+sudo apt install xperia-flashtool-legacy
+# 在 Debian 本机 XFCE 桌面终端启动，先退出新版界面：
+xperia-flashtool-legacy
+```
+
+旧版和新版可以共存，但不要同时运行。Legacy 复用新版包提供的设备库与 USB 规则，
+因此依赖 `xperia-flashtool`，另依赖 GTK2。自带旧版 Java 8，无需用户安装 Java。
+不需要 apt 降级、hold 或卸载新版。用户配置和固件目录仍为 `~/.flashTool`。
+
+分发归档来自 [AndroidMTK 镜像](https://androiddatahost.com/k9gep)，内部清单版本为
+0.9.22.3（2016-06-08）。镜像 TAR 及重新压缩资产按 SHA256 固定；这不是独立的作者签名。
+原始完整 Linux 归档、对应上游源码和 SHA256SUMS 保存在
+[专用 Release](https://github.com/metalsandbox/rakuno-apt-apps/releases/tag/flashtool-legacy-0.9.22.3)。
+仅删除不使用的 32 位运行库；不修改程序 JAR 或固件。包内保留上游运行库许可文件。

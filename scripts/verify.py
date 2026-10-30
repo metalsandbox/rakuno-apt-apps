@@ -24,7 +24,7 @@ with tempfile.TemporaryDirectory(dir=ROOT / "build") as tmp:
     (tmp / "sources.list").write_text(f"deb [signed-by={ROOT}/keys/rakuno-apt-apps.gpg] file:{ROOT}/repo stable main\n")
     opts = ["-o", f"Dir::Etc::sourcelist={tmp}/sources.list", "-o", "Dir::Etc::sourceparts=-", "-o", f"Dir::State={tmp}", "-o", f"Dir::State::status={tmp}/status", "-o", f"Dir::Cache={tmp}/cache", "-o", "APT::Sandbox::User=" + __import__('getpass').getuser(), "-o", "APT::Get::List-Cleanup=0"]
     subprocess.run(["apt-get", *opts, "update"], check=True)
-    for name in ("ddns-go", "xperia-flashtool"):
+    for name in ("ddns-go", "xperia-flashtool", "xperia-flashtool-legacy"):
         policy = subprocess.check_output(["apt-cache", *opts, "policy", name], text=True)
         print(policy)
         if "Candidate:" not in policy or "Candidate: (none)" in policy:
