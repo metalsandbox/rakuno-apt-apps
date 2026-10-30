@@ -13,3 +13,19 @@ Filename: pool/main/d/ddns-go/ddns-go_6.17.7-1_arm64.deb
 Size: 3446546
 SHA256: 56e71123f0590a78747468722e36d52bce161c6892ea63afccd476457984c502
 
+Package: xperia-flashtool-data
+Version: 20230102-1rakuno1
+Section: devel
+Priority: optional
+Architecture: all
+Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
+Replaces: xperia-flashtool (>= 0.9.36.0-1rakuno1)
+Breaks: xperia-flashtool (>= 0.9.36.0-1rakuno1)
+Homepage: https://github.com/Androxyde/devices
+Description: Offline device database for Xperia Flashtool
+ Fixed upstream snapshot 4f354572579e62337d56a6b9319f7f8b31b3378a.
+ Includes Xperia Z1 C69XX and SOL23 definitions; contains no runtime.
+Filename: pool/main/x/xperia-flashtool-data/xperia-flashtool-data_20230102-1rakuno1_all.deb
+Size: 28398284
+SHA256: e75a658ca1185598cc925f00f341d58b23d584eec41c29e0d4f19ec27340847d
+

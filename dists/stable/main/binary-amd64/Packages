@@ -14,18 +14,34 @@ Size: 3870840
 SHA256: 27cae4a5d026b89d91902bfde77047d2da9e06f289e1a89ed24f976f684d9293
 
 Package: xperia-flashtool
-Version: 0.9.36.0-1rakuno1
+Version: 0.9.22.3-1rakuno1
 Section: devel
 Priority: optional
 Architecture: amd64
 Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
-Depends: libc6 (>= 2.34), libstdc++6, zlib1g, libgtk-3-0t64, libxtst6, libxi6, libxrender1, libasound2t64, libfreetype6, libfontconfig1, libusb-1.0-0, libudev1, udev, ca-certificates
+Depends: xperia-flashtool-data (= 20230102-1rakuno1), libc6 (>= 2.34), libstdc++6, zlib1g, libgtk2.0-0t64, libxtst6, libxi6, libxrender1, libasound2t64, libfreetype6, libfontconfig1, libusb-1.0-0, libudev1, udev, ca-certificates
 Homepage: https://github.com/Androxyde/Flashtool
-Description: Sony Xperia S1 firmware flasher (official Linux bundle)
- Official amd64 release with bundled Java, offline device database,
- desktop launcher and local-session USB access rules. Targets Debian 13.
- Firmware flashing is only performed when explicitly started in the GUI.
-Filename: pool/main/x/xperia-flashtool/xperia-flashtool_0.9.36.0-1rakuno1_amd64.deb
-Size: 93001818
-SHA256: fd3c8b653bf851bdf0206d49670bd35d5b9748e31aa3d4bc0a26993ea0552dfc
+Description: Legacy Xperia Flashtool 0.9.22.3 for S1 devices
+ Archived Linux amd64 program with bundled Java 8, separate launcher and
+ offline device database and local-session Sony USB rules.
+ It predates the later strict firmware/device model-string check.
+Filename: pool/main/x/xperia-flashtool/xperia-flashtool_0.9.22.3-1rakuno1_amd64.deb
+Size: 101178150
+SHA256: cafd014042f8da78d56a9c46b6fe241c6db418e2dc5073b490997dedd6a0ec9d
+
+Package: xperia-flashtool-data
+Version: 20230102-1rakuno1
+Section: devel
+Priority: optional
+Architecture: all
+Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
+Replaces: xperia-flashtool (>= 0.9.36.0-1rakuno1)
+Breaks: xperia-flashtool (>= 0.9.36.0-1rakuno1)
+Homepage: https://github.com/Androxyde/devices
+Description: Offline device database for Xperia Flashtool
+ Fixed upstream snapshot 4f354572579e62337d56a6b9319f7f8b31b3378a.
+ Includes Xperia Z1 C69XX and SOL23 definitions; contains no runtime.
+Filename: pool/main/x/xperia-flashtool-data/xperia-flashtool-data_20230102-1rakuno1_all.deb
+Size: 28398284
+SHA256: e75a658ca1185598cc925f00f341d58b23d584eec41c29e0d4f19ec27340847d
 
