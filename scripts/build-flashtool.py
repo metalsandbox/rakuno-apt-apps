@@ -42,7 +42,7 @@ def main():
     unpack("devices.tar.gz", work / "devices")
     stage = work / "stage"
     base = stage / "usr/lib/xperia-flashtool"
-    shutil.copytree(work / "upstream/FlashTool", base, symlinks=True)
+    shutil.copytree(work / "upstream/Flashtool", base, symlinks=True)
     # We use a launcher with quoted paths and normal local desktop USB access.
     (base / "FlashTool").unlink()
     java = (base / "jre/bin/java").read_bytes()

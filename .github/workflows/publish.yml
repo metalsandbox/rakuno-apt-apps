@@ -109,3 +109,23 @@ jobs:
       - name: Deploy signed repository
         id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+  verify-live:
+    needs: deploy
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Verify published HTTPS source using Debian 13 APT
+        run: |
+          docker run --rm -v "$PWD/keys:/keys:ro" debian:trixie sh -ec '
+            # Bootstrap HTTPS trust from Debian using its already trusted source.
+            apt-get update
+            apt-get download ca-certificates
+            dpkg-deb -x ca-certificates*.deb /tmp/certs
+            cat /tmp/certs/usr/share/ca-certificates/mozilla/*.crt > /tmp/ca-certificates.crt
+            printf "%s\n" "deb [arch=amd64 signed-by=/keys/rakuno-apt-apps.gpg] https://metalsandbox.github.io/rakuno-apt-apps stable main" > /etc/apt/sources.list.d/rakuno.list
+            apt-get -o Acquire::https::CaInfo=/tmp/ca-certificates.crt -o APT::Update::Error-Mode=any update
+            apt-cache policy xperia-flashtool
+            apt-get -s install xperia-flashtool
+            apt-get -o Acquire::https::CaInfo=/tmp/ca-certificates.crt download xperia-flashtool
+            dpkg-deb -f xperia-flashtool*.deb Version | grep -Fx 0.9.36.0-1rakuno1
+          '
