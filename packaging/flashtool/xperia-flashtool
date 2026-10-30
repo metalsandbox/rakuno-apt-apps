@@ -10,9 +10,10 @@ if [ ! -e "$state/devices" ] && [ ! -L "$state/devices" ]; then
     cp -R /usr/share/xperia-flashtool/devices "$state/devices"
 fi
 cd "$base"
-export JAVA_HOME="$base/jre"
-export JNI_PATH="$base/x10flasher_native/udev"
-exec "$JAVA_HOME/bin/java" -Xms256m -Xmx1024m \
+export JAVA_HOME="$base/x10flasher_lib/linjre64"
+export LD_LIBRARY_PATH="$base/x10flasher_lib/linux/lib64/udev1"
+exec "$JAVA_HOME/bin/java" -Xms128m -Xmx1024m \
     -Duser.country=US -Duser.language=en \
-    -Djava.library.path="$JNI_PATH" -Djna.library.path="$JNI_PATH" \
-    -classpath "$base/lib/*" org.flashtool.gui.Main "$@"
+    -Djna.library.path="$LD_LIBRARY_PATH" \
+    -classpath "$base/x10flasher.jar:$base/x10flasher_lib/*:$base/x10flasher_lib/swtlin/x86_64/*" \
+    gui.Main "$@"

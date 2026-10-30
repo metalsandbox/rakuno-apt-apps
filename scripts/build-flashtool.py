@@ -1,71 +1,91 @@
 #!/usr/bin/env python3
-"""Package pinned official Linux amd64 release; never install on the host."""
+"""Package the archived, unpatched upstream 0.9.22.3 Linux amd64 program."""
 import hashlib
 import io
-from pathlib import Path
 import shutil
 import subprocess
 import tarfile
+import zipfile
 from build import ROOT, download, write
 
-VERSION = "0.9.36.0-1rakuno1"
-ASSETS = {
-    "linux.tar.bz2": (
-        "https://github.com/Androxyde/Flashtool/releases/download/0.9.36.0/Flashtool-0.9.36.0.tar.bz2",
-        "940a0450a5c7f83a686918c58cf8fee101e89f149af51a142aa763a580025b68"),
-    "devices.tar.gz": (
-        "https://github.com/Androxyde/devices/archive/4f354572579e62337d56a6b9319f7f8b31b3378a.tar.gz",
-        "08819efa9a7d06aefd89d02dbd1194586a9c10d57fe01b94f58970bd3c24978f"),
-}
-
-def unpack(name, destination):
-    url, expected = ASSETS[name]
-    cache = ROOT / "downloads" / name
-    data = cache.read_bytes() if cache.exists() else download(url)
-    if hashlib.sha256(data).hexdigest() != expected:
-        raise ValueError(f"Pinned upstream SHA256 mismatch: {name}")
-    write(cache, data)
-    destination.mkdir(parents=True, exist_ok=True)
-    with tarfile.open(fileobj=io.BytesIO(data)) as archive:
-        # Python 3.12 data filter rejects escaping links and special files.
-        archive.extractall(destination, filter="data")
+VERSION = "0.9.22.3-1rakuno1"
+RELEASE = "https://github.com/metalsandbox/rakuno-apt-apps/releases/download/flashtool-legacy-0.9.22.3/"
+SHA256 = "0e75d4843602add2df8f8e20cd3216ab282080901f98929f962d6292f0b515ed"
+TAR_SHA256 = "48c231febc544a849c5ab93f79fa52c87a03294199643619cfd33678a0bf5ca5"
 
 def main():
     output = ROOT / f"repo/pool/main/x/xperia-flashtool/xperia-flashtool_{VERSION}_amd64.deb"
     if output.exists():
         print(f"Preserving published {output.name}")
         return
-    work = ROOT / "build/flashtool"
+    data = download(RELEASE + "flashtool-0.9.22.3-linux.tar.xz")
+    if hashlib.sha256(data).hexdigest() != SHA256:
+        raise ValueError("Legacy archive SHA256 mismatch")
+    import lzma
+    tar = lzma.decompress(data)
+    if hashlib.sha256(tar).hexdigest() != TAR_SHA256:
+        raise ValueError("Original mirror TAR SHA256 mismatch")
+    work = ROOT / "build/flashtool-legacy"
     if work.exists():
         shutil.rmtree(work)
-    unpack("linux.tar.bz2", work / "upstream")
-    unpack("devices.tar.gz", work / "devices")
+    work.mkdir(parents=True)
+    with tarfile.open(fileobj=io.BytesIO(tar)) as archive:
+        archive.extractall(work / "upstream", filter="data")
     stage = work / "stage"
     base = stage / "usr/lib/xperia-flashtool"
-    shutil.copytree(work / "upstream/Flashtool", base, symlinks=True)
-    # We use a launcher with quoted paths and normal local desktop USB access.
-    (base / "FlashTool").unlink()
-    java = (base / "jre/bin/java").read_bytes()
-    if java[:6] != b"\x7fELF\x02\x01" or int.from_bytes(java[18:20], "little") != 62:
-        raise ValueError("Expected Linux amd64 Java")
+    shutil.copytree(work / "upstream/FlashTool", base, symlinks=True)
+    with zipfile.ZipFile(base / "x10flasher.jar") as jar:
+        manifest = jar.read("META-INF/MANIFEST.MF")
+        if b"Internal-Version: 0.9.22.3" not in manifest:
+            raise ValueError("Unexpected internal program version")
+        for name in jar.namelist():
+            if name.endswith(".class") and b"The bundle does not match the connected device" in jar.read(name):
+                raise ValueError("Unexpected model-string rejection in legacy binary")
+    devices_url = "https://github.com/Androxyde/devices/archive/4f354572579e62337d56a6b9319f7f8b31b3378a.tar.gz"
+    devices_data = download(devices_url)
+    if hashlib.sha256(devices_data).hexdigest() != "08819efa9a7d06aefd89d02dbd1194586a9c10d57fe01b94f58970bd3c24978f":
+        raise ValueError("Device snapshot SHA256 mismatch")
+    with tarfile.open(fileobj=io.BytesIO(devices_data)) as archive:
+        archive.extractall(work / "devices", filter="data")
     devices = next((work / "devices").iterdir())
     if not (devices / "C69XX").is_dir():
-        raise ValueError("Missing Xperia Z1 device definitions")
+        raise ValueError("Missing Xperia Z1 database")
     shutil.copytree(devices, stage / "usr/share/xperia-flashtool/devices", symlinks=True)
-    files = {
-        "xperia-flashtool": ("usr/bin/xperia-flashtool", 0o755),
-        "xperia-flashtool.desktop": ("usr/share/applications/xperia-flashtool.desktop", 0o644),
-        "70-xperia-flashtool.rules": ("usr/lib/udev/rules.d/70-xperia-flashtool.rules", 0o644),
-        "postinst": ("DEBIAN/postinst", 0o755),
-        "copyright": ("usr/share/doc/xperia-flashtool/copyright", 0o644),
-    }
-    for name, (target, mode) in files.items():
+    for name, target, mode in [
+        ("70-xperia-flashtool.rules", "usr/lib/udev/rules.d/70-xperia-flashtool.rules", 0o644),
+        ("postinst", "DEBIAN/postinst", 0o755),
+    ]:
         write(stage / target, (ROOT / "packaging/flashtool" / name).read_bytes(), mode)
-    write(stage / "usr/share/doc/xperia-flashtool/UPSTREAM", """Official upstream Linux bundle, including its Java 17 runtime and library notices.
-Source: https://github.com/Androxyde/Flashtool/tree/29709d7e6291d8aacd496688708f77a4fc89daec
-Devices: https://github.com/Androxyde/devices/tree/4f354572579e62337d56a6b9319f7f8b31b3378a
-SHA256 values pinned in scripts/build-flashtool.py (HTTPS origin verification,
-not an independent upstream signature). Firmware is not included.
+    # Only remove unused 32-bit payloads; do not patch program JARs or firmware.
+    for relative in ("x10flasher_lib/linjre32", "x10flasher_lib/linux/lib32", "x10flasher_lib/swtlin/x86"):
+        shutil.rmtree(base / relative)
+    for relative in ("FlashTool", "FlashToolConsole"):
+        (base / relative).unlink()
+    java = (base / "x10flasher_lib/linjre64/bin/java").read_bytes()
+    if java[:6] != b"\x7fELF\x02\x01" or int.from_bytes(java[18:20], "little") != 62:
+        raise ValueError("Expected amd64 Java runtime")
+    write(stage / "usr/bin/xperia-flashtool", (ROOT / "packaging/flashtool/xperia-flashtool").read_bytes(), 0o755)
+    write(stage / "usr/share/applications/xperia-flashtool.desktop", """[Desktop Entry]
+Type=Application
+Name=Xperia Flashtool 0.9.22.3
+Comment=Legacy Sony Xperia Z1 recovery tool
+Exec=xperia-flashtool
+Terminal=false
+Categories=System;
+""", 0o644)
+    write(stage / "usr/share/doc/xperia-flashtool/copyright", (ROOT / "packaging/flashtool/copyright").read_bytes())
+    write(stage / "usr/share/doc/xperia-flashtool/UPSTREAM", f"""Internal upstream version: 0.9.22.3, built 2016-06-08.
+Original mirror: https://androiddatahost.com/k9gep
+Mirror ZIP SHA256: e557878710cb06a98d6f0ea46da10fb037329486e9efafecb582f163a3b8f0c2
+Original TAR SHA256: {TAR_SHA256}
+Recompressed TAR SHA256: {SHA256}
+These hashes pin the inspected mirror, not an independent author signature.
+The historical MD5 for the original compressed distribution is not used as
+verification of this mirror's uncompressed TAR. Program version and absence
+of the later strict model-string rejection are also checked at build time.
+Upstream source commit: ba0404400a256ee9c0debecdebecf3fec292ea64 (0.9.22.3)
+Corresponding source archive: {RELEASE}flashtool-0.9.22.3-source.tar.gz
+No firmware files included or modified. No phone operations on installation.
 """)
     write(stage / "DEBIAN/control", f"""Package: xperia-flashtool
 Version: {VERSION}
@@ -73,27 +93,13 @@ Section: devel
 Priority: optional
 Architecture: amd64
 Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
-Depends: libc6 (>= 2.34), libstdc++6, zlib1g, libgtk-3-0t64, libxtst6, libxi6, libxrender1, libasound2t64, libfreetype6, libfontconfig1, libusb-1.0-0, libudev1, udev, ca-certificates
+Depends: libc6 (>= 2.34), libstdc++6, zlib1g, libgtk2.0-0t64, libxtst6, libxi6, libxrender1, libasound2t64, libfreetype6, libfontconfig1, libusb-1.0-0, libudev1, udev, ca-certificates
 Homepage: https://github.com/Androxyde/Flashtool
-Description: Sony Xperia S1 firmware flasher (official Linux bundle)
- Official amd64 release with bundled Java, offline device database,
- desktop launcher and local-session USB access rules. Targets Debian 13.
- Firmware flashing is only performed when explicitly started in the GUI.
+Description: Legacy Xperia Flashtool 0.9.22.3 for S1 devices
+ Archived Linux amd64 program with bundled Java 8, separate launcher and
+ offline device database and local-session Sony USB rules.
+ It predates the later strict firmware/device model-string check.
 """)
-    # Include corresponding upstream source next to the binary distribution.
-    source = download("https://github.com/Androxyde/Flashtool/archive/29709d7e6291d8aacd496688708f77a4fc89daec.tar.gz")
-    # Keep the complete upstream archive (including bundled build resources),
-    # split below GitHub's 100 MiB Git blob limit without discarding sources.
-    part_size = 90 * 1024 * 1024
-    for part, offset in enumerate(range(0, len(source), part_size)):
-        write(output.parent / f"xperia-flashtool_0.9.36.0.upstream-source.tar.gz.part{part:02d}", source[offset:offset + part_size])
-    write(output.parent / "SOURCE.txt", f"""Complete upstream source archive, split to fit GitHub Git size limits.
-Reassemble: cat xperia-flashtool_0.9.36.0.upstream-source.tar.gz.part* > upstream-source.tar.gz
-SHA256 (reassembled): {hashlib.sha256(source).hexdigest()}
-Original: https://github.com/Androxyde/Flashtool/archive/29709d7e6291d8aacd496688708f77a4fc89daec.tar.gz
-Packaging source: https://github.com/metalsandbox/rakuno-apt-apps
-""")
-    write(output.parent / "xperia-flashtool_devices-source.tar.gz", (ROOT / "downloads/devices.tar.gz").read_bytes())
     output.parent.mkdir(parents=True, exist_ok=True)
     subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(stage), str(output)], check=True)
 

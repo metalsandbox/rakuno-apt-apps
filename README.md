@@ -89,52 +89,41 @@ Actions 在 main 更新、每天定时和手动触发时构建，构建验证成
 
 新增包的构建应接入同一个串行发布工作流，在统一生成索引和签名前完成，避免多个工作流相互覆盖 gh-pages。当前 `scripts/build.py` 实现首个 ddns-go 构建与共享索引生成；新增第二个包时应将共享索引生成拆为独立步骤。不要覆盖已有版本文件；修改打包内容必须增加 Debian revision。
 
-## Xperia Flashtool（Debian 13 amd64）
+## Xperia Flashtool 0.9.22.3（Debian 13 amd64）
 
-提供 `xperia-flashtool`，包装 Androxyde 官方 0.9.36.0 Linux x86-64 发布包，
-保留自带 Java 17 与第三方库。目标为 Debian 13 XFCE 等本地桌面；不提供 ARM 包。
-固定 SHA256 校验官方资产，设备库固定为 `4f354572579e62337d56a6b9319f7f8b31b3378a`。
-上游源码和设备库源码与 deb 一起公开保存在 pool。此包与 Debian 官方维护版本无隶属关系。
+本源针对 Xperia Z1 SOL23 恢复原厂的需求，选用原版 0.9.22.3 Linux 程序。
+该版本早于后续严格型号字符串检查；不修改 FTF 或程序 JAR。
+这不表示其他型号手机可以使用 SOL23 固件。实际刷写仍由用户手动开始。
 
-已添加上述统一源和公钥的用户，手动执行：
+新安装用户：
 
 ```sh
 sudo apt update
-apt-cache policy xperia-flashtool
 sudo apt install xperia-flashtool
 ```
 
-APT 会显示运行库依赖，确认后安装。在 Debian 本机 XFCE 的应用菜单或终端运行
-`xperia-flashtool`。不要用 sudo 启动界面。首次启动会复制离线设备库到
-`~/.flashTool/devices`，新配置默认 `gitauto=false`，已有配置和设备库不覆盖。
-可在程序中自行启用在线设备库同步。
-
-USB 规则只向活动本地桌面会话授权 Sony `0fce` 设备；安装后重新插入手机生效。
-SSH 会话本身不获得桌面 USB 权限。软件包不会启动刷机、解锁手机或操作手机数据。
-固件 FTF 需另行准备。安装、卸载不删除 `~/.flashTool`。
-
-CI 在临时 Debian 13 容器内验证依赖安装、Java、普通用户图形启动与离线设备库，
-不连接手机，不验证真实硬件刷写。发布后再验证 HTTPS 签名源和 APT 候选版本。
-
-### Xperia Flashtool Legacy 0.9.22.3
-
-针对实际为 SOL23、当前却报告旧跨刷系统 C6903 型号的恢复场景，提供独立旧版包。
-原版 0.9.22.3 早于后续严格型号字符串检查；不修改 FTF 或程序 JAR。
-这不表示其他型号手机可以使用 SOL23 固件。实际刷写仍由用户手动开始。
+已安装本源 0.9.36.0 的用户，先退出 Flashtool，再手动降级：
 
 ```sh
 sudo apt update
-sudo apt install xperia-flashtool-legacy
-# 在 Debian 本机 XFCE 桌面终端启动，先退出新版界面：
-xperia-flashtool-legacy
+sudo apt install --allow-downgrades xperia-flashtool=0.9.22.3-1rakuno1
 ```
 
-旧版和新版可以共存，但不要同时运行。Legacy 复用新版包提供的设备库与 USB 规则，
-因此依赖 `xperia-flashtool`，另依赖 GTK2。自带旧版 Java 8，无需用户安装 Java。
-不需要 apt 降级、hold 或卸载新版。用户配置和固件目录仍为 `~/.flashTool`。
+在 Debian 本机 XFCE 等桌面终端启动 `xperia-flashtool`，不要使用 sudo。
+新版程序由 APT 替换，不另装 legacy 包。无需 apt hold：历史 0.9.36.0 文件保留，
+但不再进入活动 APT 索引，避免再次升级回不适合此恢复场景的版本。
+
+自带 64 位 Java 8；APT 安装 GTK2 等运行库，不需另装 Java。
+首次启动复制离线设备库到 `~/.flashTool/devices`，新配置默认 `gitauto=false`；
+已有配置、设备库和固件不覆盖。Sony USB 规则授权活动本地桌面会话，安装后重新
+插入手机生效。SSH 会话本身不获得桌面 USB 权限。
 
 分发归档来自 [AndroidMTK 镜像](https://androiddatahost.com/k9gep)，内部清单版本为
 0.9.22.3（2016-06-08）。镜像 TAR 及重新压缩资产按 SHA256 固定；这不是独立的作者签名。
-原始完整 Linux 归档、对应上游源码和 SHA256SUMS 保存在
+原始完整 Linux 归档、对应上游源码和校验文件保存在
 [专用 Release](https://github.com/metalsandbox/rakuno-apt-apps/releases/tag/flashtool-legacy-0.9.22.3)。
-仅删除不使用的 32 位运行库；不修改程序 JAR 或固件。包内保留上游运行库许可文件。
+仅删除不用的 32 位运行库，包内保留上游运行库许可文件。
+
+CI 在临时 Debian 13 容器验证依赖安装、Java 和普通用户图形启动；发布后验证
+HTTPS 签名源、候选版本、模拟安装及下载。验证不连接手机，不代表实机刷写已成功。
+固件需另行准备。安装不启动界面、不解锁或写入手机；卸载不删除 `~/.flashTool`。

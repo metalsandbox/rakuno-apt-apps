@@ -44,15 +44,15 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 scripts/build-flashtool.py
-          python3 scripts/build-flashtool-legacy.py
           python3 -c 'import sys; sys.path.insert(0,"scripts"); from build import index; index()'
       - name: Verify Debian 13 dependencies and GUI in disposable container
         run: |
           docker run --rm -v "$PWD:/work:ro" debian:trixie sh -ec '
             apt-get update
-            apt-get install -y --no-install-recommends /work/repo/pool/main/x/xperia-flashtool/*_amd64.deb xvfb xauth
-            apt-get install -y --no-install-recommends /work/repo/pool/main/x/xperia-flashtool-legacy/*_amd64.deb
-            /usr/lib/xperia-flashtool/jre/bin/java -version
+            apt-get install -y --no-install-recommends /work/repo/pool/main/x/xperia-flashtool/xperia-flashtool_0.9.36.0-1rakuno1_amd64.deb xvfb xauth
+            apt-get install -y --allow-downgrades --no-install-recommends /work/repo/pool/main/x/xperia-flashtool/xperia-flashtool_0.9.22.3-1rakuno1_amd64.deb
+            test ! -e /usr/lib/xperia-flashtool/jre/bin/java
+            /usr/lib/xperia-flashtool/x10flasher_lib/linjre64/bin/java -version
             useradd -m tester
             set +e
             timeout 30s su -s /bin/sh tester -c "xvfb-run -a xperia-flashtool" > /tmp/gui.log 2>&1
@@ -63,14 +63,6 @@ jobs:
             ! grep -E "UnsatisfiedLinkError|NoClassDefFoundError|Exception in thread|SWTError|Libusb not found" /tmp/gui.log
             test -d /home/tester/.flashTool/devices/C69XX
             grep -q "gitauto=false" /home/tester/.flashTool/config.properties
-            /usr/lib/xperia-flashtool-legacy/x10flasher_lib/linjre64/bin/java -version
-            set +e
-            timeout 30s su -s /bin/sh tester -c "xvfb-run -a xperia-flashtool-legacy" > /tmp/legacy-gui.log 2>&1
-            result=$?
-            set -e
-            cat /tmp/legacy-gui.log
-            test "$result" = 124
-            ! grep -E "UnsatisfiedLinkError|NoClassDefFoundError|Exception in thread|SWTError|Libusb not found" /tmp/legacy-gui.log
           '
       - name: Sign APT metadata
         env:
@@ -137,9 +129,5 @@ jobs:
             apt-cache policy xperia-flashtool
             apt-get -s install xperia-flashtool
             apt-get -o Acquire::https::CaInfo=/tmp/ca-certificates.crt download xperia-flashtool
-            dpkg-deb -f xperia-flashtool*.deb Version | grep -Fx 0.9.36.0-1rakuno1
-            apt-cache policy xperia-flashtool-legacy
-            apt-get -s install xperia-flashtool-legacy
-            apt-get -o Acquire::https::CaInfo=/tmp/ca-certificates.crt download xperia-flashtool-legacy
-            dpkg-deb -f xperia-flashtool-legacy*.deb Version | grep -Fx 0.9.22.3-1rakuno1
+            dpkg-deb -f xperia-flashtool*.deb Version | grep -Fx 0.9.22.3-1rakuno1
           '
