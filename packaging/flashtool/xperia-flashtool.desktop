@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Xperia Flashtool
+Comment=Flash Sony Xperia firmware
+Exec=xperia-flashtool
+Terminal=false
+Categories=System;

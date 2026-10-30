@@ -1,4 +1,4 @@
-# ddns-go APT
+# Rakuno APT Apps
 
 个人维护的多应用 Debian 软件包与签名 APT 源，ddns-go 是首个软件包，参考 [homebrew-apps](https://github.com/metalsandbox/homebrew-apps) 的定时更新结构。与 Debian 或 ddns-go 作者无隶属关系。
 
@@ -89,4 +89,29 @@ Actions 在 main 更新、每天定时和手动触发时构建，构建验证成
 
 新增包的构建应接入同一个串行发布工作流，在统一生成索引和签名前完成，避免多个工作流相互覆盖 gh-pages。当前 `scripts/build.py` 实现首个 ddns-go 构建与共享索引生成；新增第二个包时应将共享索引生成拆为独立步骤。不要覆盖已有版本文件；修改打包内容必须增加 Debian revision。
 
-目前仅发布 ddns-go，不代表已提供其他应用。
+## Xperia Flashtool（Debian 13 amd64）
+
+提供 `xperia-flashtool`，包装 Androxyde 官方 0.9.36.0 Linux x86-64 发布包，
+保留自带 Java 17 与第三方库。目标为 Debian 13 XFCE 等本地桌面；不提供 ARM 包。
+固定 SHA256 校验官方资产，设备库固定为 `4f354572579e62337d56a6b9319f7f8b31b3378a`。
+上游源码和设备库源码与 deb 一起公开保存在 pool。此包与 Debian 官方维护版本无隶属关系。
+
+已添加上述统一源和公钥的用户，手动执行：
+
+```sh
+sudo apt update
+apt-cache policy xperia-flashtool
+sudo apt install xperia-flashtool
+```
+
+APT 会显示运行库依赖，确认后安装。在 Debian 本机 XFCE 的应用菜单或终端运行
+`xperia-flashtool`。不要用 sudo 启动界面。首次启动会复制离线设备库到
+`~/.flashTool/devices`，新配置默认 `gitauto=false`，已有配置和设备库不覆盖。
+可在程序中自行启用在线设备库同步。
+
+USB 规则只向活动本地桌面会话授权 Sony `0fce` 设备；安装后重新插入手机生效。
+SSH 会话本身不获得桌面 USB 权限。软件包不会启动刷机、解锁手机或操作手机数据。
+固件 FTF 需另行准备。安装、卸载不删除 `~/.flashTool`。
+
+CI 在临时 Debian 13 容器内验证依赖安装、Java、普通用户图形启动与离线设备库，
+不连接手机，不验证真实硬件刷写。发布后再验证 HTTPS 签名源和 APT 候选版本。

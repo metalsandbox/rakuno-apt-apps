@@ -1,0 +1,2 @@
+# Sony USB devices: permit the active local desktop user, not all users.
+SUBSYSTEM=="usb", ATTR{idVendor}=="0fce", MODE="0660", TAG+="uaccess"

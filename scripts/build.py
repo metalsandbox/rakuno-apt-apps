@@ -92,6 +92,11 @@ Description: Simple dynamic DNS client
             subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(stage), str(output)], check=True)
         else:
             print(f"Preserving published package {output.name}")
+    write(repo / "upstream.json", json.dumps({"tag": tag, "revision": revision}, indent=2) + "\n")
+    print(f"Built {debversion}")
+
+def index():
+    repo = ROOT / "repo"
     for arch in ARCHES:
         entries = []
         for package in sorted((repo / "pool").rglob(f"*_{arch}.deb")):
@@ -120,8 +125,6 @@ SHA256:
     write(repo / "rakuno-apt-apps.gpg", (ROOT / "keys/rakuno-apt-apps.gpg").read_bytes())
     write(repo / "index.html", '<!doctype html><meta charset="utf-8"><title>Rakuno APT Apps</title><h1>Rakuno APT Apps</h1><p><a href="https://github.com/metalsandbox/rakuno-apt-apps#readme">Installation and signing fingerprint</a></p>')
     write(repo / ".nojekyll", "")
-    write(repo / "upstream.json", json.dumps({"tag": tag, "revision": revision}, indent=2) + "\n")
-    print(f"Built {debversion}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -131,3 +134,4 @@ if __name__ == "__main__":
     if not re.fullmatch(r"[1-9][0-9]*", args.revision):
         parser.error("revision must be a positive integer")
     build(args.tag, args.revision)
+    index()

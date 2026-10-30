@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+base=/usr/lib/xperia-flashtool
+state="$HOME/.flashTool"
+mkdir -p "$state"
+if [ ! -e "$state/config.properties" ]; then
+    (umask 077; printf 'gitauto=false\n' > "$state/config.properties")
+fi
+if [ ! -e "$state/devices" ] && [ ! -L "$state/devices" ]; then
+    cp -R /usr/share/xperia-flashtool/devices "$state/devices"
+fi
+cd "$base"
+export JAVA_HOME="$base/jre"
+export JNI_PATH="$base/x10flasher_native/udev"
+exec "$JAVA_HOME/bin/java" -Xms256m -Xmx1024m \
+    -Duser.country=US -Duser.language=en \
+    -Djava.library.path="$JNI_PATH" -Djna.library.path="$JNI_PATH" \
+    -classpath "$base/lib/*" org.flashtool.gui.Main "$@"

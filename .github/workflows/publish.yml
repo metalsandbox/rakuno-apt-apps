@@ -39,6 +39,29 @@ jobs:
           UPSTREAM_TAG: ${{ inputs.tag }}
           PACKAGING_REVISION: ${{ inputs.revision || '1' }}
         run: python3 scripts/build.py --tag "$UPSTREAM_TAG" --revision "$PACKAGING_REVISION"
+      - name: Build pinned Xperia Flashtool for Debian 13 amd64
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 scripts/build-flashtool.py
+          python3 -c 'import sys; sys.path.insert(0,"scripts"); from build import index; index()'
+      - name: Verify Debian 13 dependencies and GUI in disposable container
+        run: |
+          docker run --rm -v "$PWD:/work:ro" debian:trixie sh -ec '
+            apt-get update
+            apt-get install -y --no-install-recommends /work/repo/pool/main/x/xperia-flashtool/*_amd64.deb xvfb xauth
+            /usr/lib/xperia-flashtool/jre/bin/java -version
+            useradd -m tester
+            set +e
+            timeout 30s su -s /bin/sh tester -c "xvfb-run -a xperia-flashtool" > /tmp/gui.log 2>&1
+            result=$?
+            set -e
+            cat /tmp/gui.log
+            test "$result" = 124
+            ! grep -E "UnsatisfiedLinkError|NoClassDefFoundError|Exception in thread|SWTError|Libusb not found" /tmp/gui.log
+            test -d /home/tester/.flashTool/devices/C69XX
+            grep -q "gitauto=false" /home/tester/.flashTool/config.properties
+          '
       - name: Sign APT metadata
         env:
           APT_SIGNING_KEY: ${{ secrets.APT_SIGNING_KEY }}
