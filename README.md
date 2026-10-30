@@ -114,6 +114,7 @@ sudo apt install --allow-downgrades xperia-flashtool=0.9.22.3-1rakuno1
 但不再进入活动 APT 索引，避免再次升级回不适合此恢复场景的版本。
 
 自带 64 位 Java 8；APT 安装 GTK2 等运行库，不需另装 Java。
+设备库拆为 APT 自动安装的 `xperia-flashtool-data`，其中只有数据，不含新版程序。
 首次启动复制离线设备库到 `~/.flashTool/devices`，新配置默认 `gitauto=false`；
 已有配置、设备库和固件不覆盖。Sony USB 规则授权活动本地桌面会话，安装后重新
 插入手机生效。SSH 会话本身不获得桌面 USB 权限。

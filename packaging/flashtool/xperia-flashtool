@@ -4,8 +4,16 @@ base=/usr/lib/xperia-flashtool
 state="$HOME/.flashTool"
 mkdir -p "$state"
 if [ ! -e "$state/config.properties" ]; then
-    (umask 077; printf 'gitauto=false\n' > "$state/config.properties")
+    (umask 077; : > "$state/config.properties")
 fi
+# Unlike newer releases, 0.9.22.3 does not merge defaults into an existing file.
+while IFS= read -r setting || [ -n "$setting" ]; do
+    case "$setting" in ''|'#'*) continue ;; esac
+    key=${setting%%=*}
+    if ! grep -q "^${key}=" "$state/config.properties"; then
+        printf '\n%s\n' "$setting" >> "$state/config.properties"
+    fi
+done < /usr/share/xperia-flashtool/defaults.properties
 if [ ! -e "$state/devices" ] && [ ! -L "$state/devices" ]; then
     cp -R /usr/share/xperia-flashtool/devices "$state/devices"
 fi

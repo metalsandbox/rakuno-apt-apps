@@ -50,7 +50,7 @@ jobs:
           docker run --rm -v "$PWD:/work:ro" debian:trixie sh -ec '
             apt-get update
             apt-get install -y --no-install-recommends /work/repo/pool/main/x/xperia-flashtool/xperia-flashtool_0.9.36.0-1rakuno1_amd64.deb xvfb xauth
-            apt-get install -y --allow-downgrades --no-install-recommends /work/repo/pool/main/x/xperia-flashtool/xperia-flashtool_0.9.22.3-1rakuno1_amd64.deb
+            apt-get install -y --allow-downgrades --no-install-recommends /work/repo/pool/main/x/xperia-flashtool/xperia-flashtool_0.9.22.3-1rakuno1_amd64.deb /work/repo/pool/main/x/xperia-flashtool-data/*_all.deb
             test ! -e /usr/lib/xperia-flashtool/jre/bin/java
             /usr/lib/xperia-flashtool/x10flasher_lib/linjre64/bin/java -version
             useradd -m tester

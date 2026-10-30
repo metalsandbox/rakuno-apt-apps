@@ -99,7 +99,7 @@ def index():
     repo = ROOT / "repo"
     for arch in ARCHES:
         entries = []
-        for package in sorted((repo / "pool").rglob(f"*_{arch}.deb")):
+        for package in sorted(list((repo / "pool").rglob(f"*_{arch}.deb")) + list((repo / "pool").rglob("*_all.deb"))):
             # Keep historical artifacts, but only index the selected Z1-compatible version.
             if package.name.startswith("xperia-flashtool_") and "_0.9.22.3-1rakuno1_" not in package.name:
                 continue

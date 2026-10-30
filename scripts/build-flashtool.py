@@ -41,6 +41,8 @@ def main():
         for name in jar.namelist():
             if name.endswith(".class") and b"The bundle does not match the connected device" in jar.read(name):
                 raise ValueError("Unexpected model-string rejection in legacy binary")
+        defaults = jar.read("gui/ressources/config.properties").decode().rstrip() + "\ngitauto=false\n"
+        write(stage / "usr/share/xperia-flashtool/defaults.properties", defaults, 0o644)
     devices_url = "https://github.com/Androxyde/devices/archive/4f354572579e62337d56a6b9319f7f8b31b3378a.tar.gz"
     devices_data = download(devices_url)
     if hashlib.sha256(devices_data).hexdigest() != "08819efa9a7d06aefd89d02dbd1194586a9c10d57fe01b94f58970bd3c24978f":
@@ -50,7 +52,24 @@ def main():
     devices = next((work / "devices").iterdir())
     if not (devices / "C69XX").is_dir():
         raise ValueError("Missing Xperia Z1 database")
-    shutil.copytree(devices, stage / "usr/share/xperia-flashtool/devices", symlinks=True)
+    data_stage = work / "data-stage"
+    shutil.copytree(devices, data_stage / "usr/share/xperia-flashtool/devices", symlinks=True)
+    write(data_stage / "DEBIAN/control", """Package: xperia-flashtool-data
+Version: 20230102-1rakuno1
+Section: devel
+Priority: optional
+Architecture: all
+Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
+Homepage: https://github.com/Androxyde/devices
+Description: Offline device database for Xperia Flashtool
+ Fixed upstream snapshot 4f354572579e62337d56a6b9319f7f8b31b3378a.
+ Includes Xperia Z1 C69XX and SOL23 definitions; contains no runtime.
+""")
+    write(data_stage / "usr/share/doc/xperia-flashtool-data/UPSTREAM", devices_url + "\n")
+    data_output = ROOT / "repo/pool/main/x/xperia-flashtool-data/xperia-flashtool-data_20230102-1rakuno1_all.deb"
+    if not data_output.exists():
+        data_output.parent.mkdir(parents=True, exist_ok=True)
+        subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(data_stage), str(data_output)], check=True)
     for name, target, mode in [
         ("70-xperia-flashtool.rules", "usr/lib/udev/rules.d/70-xperia-flashtool.rules", 0o644),
         ("postinst", "DEBIAN/postinst", 0o755),
@@ -93,7 +112,7 @@ Section: devel
 Priority: optional
 Architecture: amd64
 Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
-Depends: libc6 (>= 2.34), libstdc++6, zlib1g, libgtk2.0-0t64, libxtst6, libxi6, libxrender1, libasound2t64, libfreetype6, libfontconfig1, libusb-1.0-0, libudev1, udev, ca-certificates
+Depends: xperia-flashtool-data (= 20230102-1rakuno1), libc6 (>= 2.34), libstdc++6, zlib1g, libgtk2.0-0t64, libxtst6, libxi6, libxrender1, libasound2t64, libfreetype6, libfontconfig1, libusb-1.0-0, libudev1, udev, ca-certificates
 Homepage: https://github.com/Androxyde/Flashtool
 Description: Legacy Xperia Flashtool 0.9.22.3 for S1 devices
  Archived Linux amd64 program with bundled Java 8, separate launcher and
