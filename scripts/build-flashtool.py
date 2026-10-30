@@ -60,6 +60,8 @@ Section: devel
 Priority: optional
 Architecture: all
 Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
+Replaces: xperia-flashtool (>= 0.9.36.0-1rakuno1)
+Breaks: xperia-flashtool (>= 0.9.36.0-1rakuno1)
 Homepage: https://github.com/Androxyde/devices
 Description: Offline device database for Xperia Flashtool
  Fixed upstream snapshot 4f354572579e62337d56a6b9319f7f8b31b3378a.
