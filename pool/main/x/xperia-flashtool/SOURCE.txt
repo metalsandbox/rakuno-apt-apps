@@ -1,0 +1,5 @@
+Complete upstream source archive, split to fit GitHub Git size limits.
+Reassemble: cat xperia-flashtool_0.9.36.0.upstream-source.tar.gz.part* > upstream-source.tar.gz
+SHA256 (reassembled): a3db47ee8c76d5e2aba86486582be346a0be1f03a71961ace38483c352fa4da1
+Original: https://github.com/Androxyde/Flashtool/archive/29709d7e6291d8aacd496688708f77a4fc89daec.tar.gz
+Packaging source: https://github.com/metalsandbox/rakuno-apt-apps

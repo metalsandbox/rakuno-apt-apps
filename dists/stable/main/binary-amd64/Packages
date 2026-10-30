@@ -13,3 +13,19 @@ Filename: pool/main/d/ddns-go/ddns-go_6.17.7-1_amd64.deb
 Size: 3870840
 SHA256: 27cae4a5d026b89d91902bfde77047d2da9e06f289e1a89ed24f976f684d9293
 
+Package: xperia-flashtool
+Version: 0.9.36.0-1rakuno1
+Section: devel
+Priority: optional
+Architecture: amd64
+Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
+Depends: libc6 (>= 2.34), libstdc++6, zlib1g, libgtk-3-0t64, libxtst6, libxi6, libxrender1, libasound2t64, libfreetype6, libfontconfig1, libusb-1.0-0, libudev1, udev, ca-certificates
+Homepage: https://github.com/Androxyde/Flashtool
+Description: Sony Xperia S1 firmware flasher (official Linux bundle)
+ Official amd64 release with bundled Java, offline device database,
+ desktop launcher and local-session USB access rules. Targets Debian 13.
+ Firmware flashing is only performed when explicitly started in the GUI.
+Filename: pool/main/x/xperia-flashtool/xperia-flashtool_0.9.36.0-1rakuno1_amd64.deb
+Size: 93001818
+SHA256: fd3c8b653bf851bdf0206d49670bd35d5b9748e31aa3d4bc0a26993ea0552dfc
+

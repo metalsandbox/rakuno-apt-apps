@@ -5,19 +5,19 @@ Origin: metalsandbox
 Label: rakuno-apt-apps
 Suite: stable
 Codename: stable
-Date: Thu, 29 Oct 2026 16:06:01 +0000
+Date: Fri, 30 Oct 2026 05:45:46 +0000
 Architectures: amd64 arm64
 Components: main
 Description: Rakuno apps and Debian packages
 SHA256:
- 57e69c9e74896adbf53cd2692e05a797fa6b2614abeb0ed51c02cdecde6fb41a              565 main/binary-amd64/Packages
- b7095c53a7595a822b1c01e47cefe0ae02d53d6e47e3d5699ff65717714e5599              401 main/binary-amd64/Packages.gz
+ 8e193dd6bc327f25b2bf6359e1d73bd3ccfffd255b74ef0e2e40722a0137cb0b             1425 main/binary-amd64/Packages
+ 69fbf2b9a8994082245b247fb3173d5ebabb71b4c3037f4cb1bb45c9b8a45e61              774 main/binary-amd64/Packages.gz
  10df6850276018f75f47349ecf66d38558c84235e16594d15a797f0bfe6c8404              565 main/binary-arm64/Packages
  cb42e3e007a1392ad4ed2d6af72b642e47dae56f48d5a988dbc171f17ab7e44b              402 main/binary-arm64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCauNu6QAKCRA+cwaJIER+
-Vp50AP9J0Be+5mgxS+nvzSEVd1xE1DxAv4vlqQgH9TtoH5AfsQD/bqDTgXJ2pQIc
-YmB2Vjgh7eYZxNqbcnxIxwv6h4Nf2AY=
-=OIgr
+iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCauQvQAAKCRA+cwaJIER+
+VsRPAQCvZqvnZdlkrXp+T6xeZ6SB9vd6YxsTqI0y32L+dLTL5QD/RxcYeGooIH0w
+3ockfzLF6pYnwQ/le77qq2KJVrX5eQ4=
+=be5p
 -----END PGP SIGNATURE-----
