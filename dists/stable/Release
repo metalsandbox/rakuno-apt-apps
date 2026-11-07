@@ -2,7 +2,7 @@ Origin: metalsandbox
 Label: rakuno-apt-apps
 Suite: stable
 Codename: stable
-Date: Fri, 06 Nov 2026 11:27:43 +0000
+Date: Sat, 07 Nov 2026 10:39:45 +0000
 Architectures: amd64 arm64
 Components: main
 Description: Rakuno apps and Debian packages
