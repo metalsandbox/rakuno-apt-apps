@@ -4,6 +4,7 @@ import argparse
 import datetime
 import gzip
 import hashlib
+from http.client import IncompleteRead
 import io
 import json
 import os
@@ -11,19 +12,40 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import sys
 import tarfile
+import tempfile
+import time
+import urllib.error
 import urllib.request
 
 ROOT = Path(__file__).resolve().parents[1]
 UPSTREAM = "https://api.github.com/repos/jeessy2/ddns-go/releases/"
 ARCHES = {"amd64": "x86_64", "arm64": "arm64"}
 
-def download(url):
+def download(url, label):
     headers = {"User-Agent": "metalsandbox-rakuno-apt-apps"}
     if url.startswith("https://api.github.com/") and os.getenv("GH_TOKEN"):
         headers["Authorization"] = "Bearer " + os.environ["GH_TOKEN"]
-    with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=120) as response:
-        return response.read()
+    request = urllib.request.Request(url, headers=headers)
+    for attempt, delay in enumerate((1, 2, 4, None), start=1):
+        try:
+            with urllib.request.urlopen(request, timeout=120) as response:
+                return response.read()
+        except (urllib.error.URLError, TimeoutError, ConnectionError, IncompleteRead) as error:
+            if isinstance(error, urllib.error.HTTPError):
+                retryable = error.code in (429, 500, 502, 503, 504)
+                error.close()
+            elif isinstance(error, urllib.error.URLError):
+                retryable = isinstance(error.reason, (TimeoutError, ConnectionError))
+            else:
+                retryable = True
+            detail = str(error) or type(error).__name__
+            if not retryable or delay is None:
+                raise RuntimeError(f"Could not download {label}: {detail}") from error
+            print(f"Download of {label} failed (attempt {attempt}): {detail}; retrying in {delay}s",
+                  file=sys.stderr, flush=True)
+            time.sleep(delay)
 
 def run(*args):
     return subprocess.check_output(args, text=True)
@@ -37,21 +59,51 @@ def write(path, data, mode=None):
     if mode:
         path.chmod(mode)
 
+def verify_published_package(repo, arch, output, release):
+    index_name = f"main/binary-{arch}/Packages"
+    index_data = (repo / "dists/stable" / index_name).read_bytes()
+    sha256_section = release.partition("\nSHA256:\n")[2]
+    expected = f"{hashlib.sha256(index_data).hexdigest()} {len(index_data)} {index_name}"
+    if expected not in (" ".join(line.split()) for line in sha256_section.splitlines() if line.startswith(" ")):
+        raise ValueError(f"Published index does not match signed Release: {index_name}")
+
+    filename = f"Filename: {output.relative_to(repo)}"
+    digest = f"SHA256: {hashlib.sha256(output.read_bytes()).hexdigest()}"
+    for entry in index_data.decode().split("\n\n"):
+        fields = entry.splitlines()
+        if filename in fields and digest in fields:
+            return
+    raise ValueError(f"Published package does not match signed index: {output.name}")
+
 def build(tag, revision):
-    release = json.loads(download(UPSTREAM + ("tags/" + tag if tag else "latest")))
+    release = json.loads(download(UPSTREAM + ("tags/" + tag if tag else "latest"),
+                                  f"ddns-go release metadata ({tag or 'latest'})"))
     tag = release["tag_name"]
     if release["draft"] or release["prerelease"] or not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
         raise ValueError("Only stable numeric upstream releases are accepted")
     version = tag[1:]
     debversion = version + "-" + revision
     assets = {asset["name"]: asset for asset in release["assets"]}
-    sums = download(assets["checksums.txt"]["browser_download_url"]).decode()
-    checksums = {parts[1].lstrip("*"): parts[0] for line in sums.splitlines() if len(parts := line.split()) == 2}
     repo = ROOT / "repo"
+    published_release = None
+    checksums = None
     for arch, upstream_arch in ARCHES.items():
+        output = repo / "pool/main/d/ddns-go" / f"ddns-go_{debversion}_{arch}.deb"
+        # Published versions are immutable; bump --revision for packaging changes.
+        if output.exists():
+            if published_release is None:
+                published_release = run("gpgv", "--keyring", str(ROOT / "keys/rakuno-apt-apps.gpg"),
+                                        "--output", "-", str(repo / "dists/stable/InRelease"))
+            verify_published_package(repo, arch, output, published_release)
+            print(f"Preserving verified published package {output.name}")
+            continue
+
+        if checksums is None:
+            sums = download(assets["checksums.txt"]["browser_download_url"], f"ddns-go {tag} checksums.txt").decode()
+            checksums = {parts[1].lstrip("*"): parts[0] for line in sums.splitlines() if len(parts := line.split()) == 2}
         name = f"ddns-go_{version}_linux_{upstream_arch}.tar.gz"
         asset = assets[name]
-        data = download(asset["browser_download_url"])
+        data = download(asset["browser_download_url"], name)
         digest = hashlib.sha256(data).hexdigest()
         if digest != checksums.get(name):
             raise ValueError(f"Upstream checksum mismatch: {name}")
@@ -85,13 +137,11 @@ Description: Simple dynamic DNS client
  Configuration listens on localhost:9876 and is retained across removal.
 """
         write(stage / "DEBIAN/control", control)
-        output = repo / "pool/main/d/ddns-go" / f"ddns-go_{debversion}_{arch}.deb"
         output.parent.mkdir(parents=True, exist_ok=True)
-        # Published versions are immutable; bump --revision for packaging changes.
-        if not output.exists():
-            subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(stage), str(output)], check=True)
-        else:
-            print(f"Preserving published package {output.name}")
+        with tempfile.TemporaryDirectory(dir=output.parent) as tmp:
+            candidate = Path(tmp) / output.name
+            subprocess.run(["dpkg-deb", "--root-owner-group", "--build", str(stage), str(candidate)], check=True)
+            candidate.replace(output)
     write(repo / "upstream.json", json.dumps({"tag": tag, "revision": revision}, indent=2) + "\n")
     print(f"Built {debversion}")
 
