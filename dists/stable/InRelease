@@ -5,7 +5,7 @@ Origin: metalsandbox
 Label: rakuno-apt-apps
 Suite: stable
 Codename: stable
-Date: Sat, 07 Nov 2026 10:39:45 +0000
+Date: Mon, 09 Nov 2026 12:04:50 +0000
 Architectures: amd64 arm64
 Components: main
 Description: Rakuno apps and Debian packages
@@ -16,8 +16,8 @@ SHA256:
  28f5b34872940e34ddc421515f93515231f35f1dbd74260da912af0859d987d7              677 main/binary-arm64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCau8AKwAKCRA+cwaJIER+
-VvIaAQD70QAIaUFMHsxC/IOg965F/GX3w39zzpxzlnMiskHBBAD+ImPZjRjKBebP
-WjU79SQNrrh8gMtN5u25nVKcZszDMAw=
-=10mh
+iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCavG3HgAKCRA+cwaJIER+
+VkUtAP46wvlVi3ACBLU1O3S83EBal9JGaNWoNpu8YRu/yItEpwD/cnFRGTeSGztU
+849hIn/Wsv5WY6P5PbSZSipLvn3GTQ8=
+=tflN
 -----END PGP SIGNATURE-----
