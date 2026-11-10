@@ -5,19 +5,19 @@ Origin: metalsandbox
 Label: rakuno-apt-apps
 Suite: stable
 Codename: stable
-Date: Mon, 09 Nov 2026 12:04:50 +0000
+Date: Tue, 10 Nov 2026 11:44:02 +0000
 Architectures: amd64 arm64
 Components: main
 Description: Rakuno apps and Debian packages
 SHA256:
- cbda37b29add96fde5e3b2f722dfcad538c0e3f030e521bd0807ad3309458492             2144 main/binary-amd64/Packages
- 248ea820a4a234138a33985da9fdca00f84414f8ef0d8799eb4c8d935c0d57fe              992 main/binary-amd64/Packages.gz
- 3e74a2e321982994116a10104e1180999c57984558dfe413f174c6f5dec7619a             1261 main/binary-arm64/Packages
- 28f5b34872940e34ddc421515f93515231f35f1dbd74260da912af0859d987d7              677 main/binary-arm64/Packages.gz
+ 4419f52b23a189afea7097166ab742c51f16971adf3d7ee73ab88d01bf9fedc5             2709 main/binary-amd64/Packages
+ 2e2d2d539f80fb28cff320855e73859104d58c03b733cfff33411904fc5fa75f             1058 main/binary-amd64/Packages.gz
+ bd52046d76e67d3ae7116d6a32eaae452475d57fb54f029357b737d458942582             1826 main/binary-arm64/Packages
+ 024dafe653de26d01f53bc78dbc6b135b90a550d8d45882444fc8bd2962dd19c              745 main/binary-arm64/Packages.gz
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCavG3HgAKCRA+cwaJIER+
-VkUtAP46wvlVi3ACBLU1O3S83EBal9JGaNWoNpu8YRu/yItEpwD/cnFRGTeSGztU
-849hIn/Wsv5WY6P5PbSZSipLvn3GTQ8=
-=tflN
+iHUEARYIAB0WIQRqyxVe0cfVFfPgMnk+cwaJIER+VgUCavMDvAAKCRA+cwaJIER+
+VifhAQD2VxjQ928Xp4WmZscKaOMDDSqvarSHoeJxpL8CypQYEgEA1KzNxk2oYcY/
+VbcjJ3a0bF1i8cCgwOoQ23oLpnPIdQQ=
+=jYhf
 -----END PGP SIGNATURE-----
