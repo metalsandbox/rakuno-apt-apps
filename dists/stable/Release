@@ -2,12 +2,12 @@ Origin: metalsandbox
 Label: rakuno-apt-apps
 Suite: stable
 Codename: stable
-Date: Tue, 17 Nov 2026 12:25:26 +0000
+Date: Wed, 18 Nov 2026 12:12:47 +0000
 Architectures: amd64 arm64
 Components: main
 Description: Rakuno apps and Debian packages
 SHA256:
- 4419f52b23a189afea7097166ab742c51f16971adf3d7ee73ab88d01bf9fedc5             2709 main/binary-amd64/Packages
- 2e2d2d539f80fb28cff320855e73859104d58c03b733cfff33411904fc5fa75f             1058 main/binary-amd64/Packages.gz
- bd52046d76e67d3ae7116d6a32eaae452475d57fb54f029357b737d458942582             1826 main/binary-arm64/Packages
- 024dafe653de26d01f53bc78dbc6b135b90a550d8d45882444fc8bd2962dd19c              745 main/binary-arm64/Packages.gz
+ 6ebb331063d0574b85a884d693cd0b71983ba244655bcd4f655a36dc180c6fc8             3274 main/binary-amd64/Packages
+ 9073596c4fafe17a8f72b603091436062b31cf1958ea9148d12d22d5e6b7451e             1118 main/binary-amd64/Packages.gz
+ 9b722e120b35de2bea97ad1ffab9a96b8faeff839666439d4ccc5dd4eef40012             2391 main/binary-arm64/Packages
+ b56a247e855616c7e78644ce24836f8fa81a3a0af71145bd0a6d5542bb6e99c3              801 main/binary-arm64/Packages.gz
