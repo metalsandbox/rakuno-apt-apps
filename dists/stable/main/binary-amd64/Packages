@@ -43,6 +43,21 @@ Filename: pool/main/d/ddns-go/ddns-go_6.17.9-1_amd64.deb
 Size: 3933862
 SHA256: 05bea50fce7e0185f8c469cba39d16a3a64057910600f1b9c8d52f949c8e4af1
 
+Package: ddns-go
+Version: 6.18.0-1
+Section: net
+Priority: optional
+Architecture: amd64
+Maintainer: metalsandbox <metalsandbox@users.noreply.github.com>
+Depends: ca-certificates, systemd (>= 245)
+Homepage: https://github.com/jeessy2/ddns-go
+Description: Simple dynamic DNS client
+ Upstream ddns-go binary packaged with a sandboxed systemd service.
+ Configuration listens on localhost:9876 and is retained across removal.
+Filename: pool/main/d/ddns-go/ddns-go_6.18.0-1_amd64.deb
+Size: 3933538
+SHA256: 97a05197477b5c5f7bdc256f61f688fb94fa458a7239ce8f0953ae6f2ec942a8
+
 Package: xperia-flashtool
 Version: 0.9.22.3-1rakuno1
 Section: devel
